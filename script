@@ -25,7 +25,7 @@ apply_and_document_change() {
       exit 1
     fi
     current_value=$(grep "^$setting" "$SSHD_CONFIG")
-    sed -i "s/^$current_value$/$current_value > $setting $new_value/" "$SSHD_CONFIG"
+    sed -i "s/^$current_value$/$setting $new_value/" "$SSHD_CONFIG"
     if [ $? -ne 0 ]; then
       echo "❌ Failed to update $setting to $new_value"
       exit 1
@@ -36,13 +36,13 @@ apply_and_document_change() {
       exit 1
     fi
     current_value=$(grep "^#$setting" "$SSHD_CONFIG")
-    sed -i "s/^$current_value$/$current_value > $setting $new_value/" "$SSHD_CONFIG"
+    sed -i "s/^$current_value$/$setting $new_value/" "$SSHD_CONFIG"
     if [ $? -ne 0 ]; then
       echo "❌ Failed to update $setting to $new_value"
       exit 1
     fi
   else
-    echo "# $setting > $setting $new_value" >> "$SSHD_CONFIG"
+    echo "$setting $new_value" >> "$SSHD_CONFIG"
     if [ $? -ne 0 ]; then
       echo "❌ Failed to add $setting $new_value"
       exit 1
@@ -50,7 +50,7 @@ apply_and_document_change() {
   fi
 
   # Double check the change
-  if ! grep -q "^#*$setting.*> $setting $new_value" "$SSHD_CONFIG"; then
+  if ! grep -q "^$setting $new_value" "$SSHD_CONFIG"; then
     if [ $? -ne 0 ]; then
       echo "❌ Failed to verify the change for $setting"
       exit 1
@@ -109,7 +109,7 @@ verify_setting() {
   local setting="$1"
   local expected_value="$2"
 
-  if ! grep -q "^#*$setting.*> $setting $expected_value" "$SSHD_CONFIG"; then
+  if ! grep -q "^$setting $expected_value" "$SSHD_CONFIG"; then
     if [ $? -ne 0 ]; then
       echo "❌ Failed to verify the setting for $setting"
       exit 1
