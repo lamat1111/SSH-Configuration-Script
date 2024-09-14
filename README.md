@@ -8,11 +8,16 @@ Disabling password authentication can lead to unintended consequences, including
 
 ## Usage
 
+### Run directly
+
+`wget -O - https://raw.githubusercontent.com/lamat1111/password-connection-disabler/master/configure_ssh.sh | bash`
+
+### Run locally
+
 1. Make sure you have the necessary permissions to modify the `sshd_config` file and restart the SSH service.
 2. Download or clone the script to your system.
 3. Make the script executable: `chmod +x configure_ssh.sh`
 4. Run the script with sudo privileges: `sudo ./configure_ssh.sh`
-
 
 ## Configuration Changes
 
