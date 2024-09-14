@@ -10,8 +10,8 @@ Disabling password authentication can lead to unintended consequences, including
 
 1. Make sure you have the necessary permissions to modify the `sshd_config` file and restart the SSH service.
 2. Download or clone the script to your system.
-3. Make the script executable: `chmod +x configure_sshd.sh`
-4. Run the script with sudo privileges: `sudo ./configure_sshd.sh`
+3. Make the script executable: `chmod +x configure_ssh.sh`
+4. Run the script with sudo privileges: `sudo ./configure_ssh.sh`
 
 
 ## Configuration Changes
