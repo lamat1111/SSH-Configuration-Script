@@ -3,6 +3,8 @@
 # Path to sshd_config
 SSHD_CONFIG="/etc/ssh/sshd_config"
 
+trap 'echo "❌ An error occurred. Reverting changes..."; cp "$SSHD_CONFIG.bak" "$SSHD_CONFIG"; exit 1' ERR
+
 # Function to apply changes and document them
 apply_and_document_change() {
   local setting="$1"
