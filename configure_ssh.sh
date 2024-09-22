@@ -19,24 +19,27 @@ trap 'handle_error "An unexpected error occurred. Reverting changes..." "yes"' E
 apply_and_document_change() {
   local setting="$1"
   local new_value="$2"
-
   if grep -q "^$setting $new_value" "$SSHD_CONFIG"; then
     echo "🔄 $setting is already set to $new_value. Skipping..."
     return
   fi
-
   if grep -q "^$setting" "$SSHD_CONFIG" || grep -q "^#$setting" "$SSHD_CONFIG"; then
     sed -i "/^$setting\|^#$setting/c\\$setting $new_value" "$SSHD_CONFIG"
   else
     echo "$setting $new_value" >> "$SSHD_CONFIG"
   fi
-
   if ! grep -q "^$setting $new_value" "$SSHD_CONFIG"; then
     handle_error "Failed to apply $setting $new_value" "yes"
   else
     echo "✅ Applied $setting $new_value"
   fi
 }
+
+# Check if running as root
+if [ "$(id -u)" -ne 0 ]; then
+  echo "❌ This script must be run as root" >&2
+  exit 1
+fi
 
 # Backup the original sshd_config file
 echo "📂 Backing up the original sshd_config file..."
@@ -53,13 +56,11 @@ apply_and_document_change "PasswordAuthentication" "no"
 
 # Ensure Pubkey Authentication is Enabled
 echo "🔧 Ensuring public key authentication is enabled..."
-if ! grep -q "^PubkeyAuthentication yes" "$SSHD_CONFIG"; then
-  apply_and_document_change "PubkeyAuthentication" "yes"
-fi
+apply_and_document_change "PubkeyAuthentication" "yes"
 
 # Restart SSH service
 echo "🔄 Restarting SSH service..."
-if ! systemctl restart sshd; then
+if ! systemctl restart ssh; then
   echo "❌ Failed to restart SSH service"
   # Do not restore the backup, just exit
   exit 1
@@ -70,7 +71,6 @@ echo "✅ SSH service restarted successfully"
 verify_setting() {
   local setting="$1"
   local expected_value="$2"
-
   if ! grep -q "^$setting $expected_value" "$SSHD_CONFIG"; then
     handle_error "$setting is not set to $expected_value as expected" "yes"
   else
