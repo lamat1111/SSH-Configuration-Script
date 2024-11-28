@@ -83,4 +83,31 @@ verify_setting "PermitRootLogin" "prohibit-password"
 verify_setting "PasswordAuthentication" "no"
 verify_setting "PubkeyAuthentication" "yes"
 
-echo "🎉 All settings are applied and verified successfully"
+# Check for existing public keys
+echo
+echo "🔍 Checking for existing public keys..."
+if ! find /home/*/.ssh/authorized_keys /root/.ssh/authorized_keys -type f 2>/dev/null | grep -q .; then
+  echo "⚠️  WARNING: No public keys found on the server. Make sure to add a public key before logging out!"
+fi
+echo
+echo "Leave this window open and test the connection to your server in another window. If it doesn't work, restore your sshd_config backup."
+
+# Ask about backup restoration
+while true; do
+  read -p "Do you want to restore the sshd_config backup? (y/n) " answer
+  case $answer in
+    [Yy]* )
+      cp "$SSHD_CONFIG.bak" "$SSHD_CONFIG"
+      systemctl restart ssh
+      echo "✅ Backup restored and SSH service restarted"
+      exit 0
+      ;;
+    [Nn]* )
+      echo "🎉 All settings are applied and verified successfully"
+      exit 0
+      ;;
+    * )
+      echo "Please answer y or n."
+      ;;
+  esac
+done
