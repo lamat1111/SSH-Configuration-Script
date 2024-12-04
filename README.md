@@ -1,28 +1,44 @@
-# Password connection disabler script
+# SSH Configuration Script
 
-This script automates the configuration of the SSH server by modifying the `sshd_config` file. It disables password access for the root user, ensures password authentication is disabled, and enables public key authentication. Additionally, it restarts the SSH service to apply the changes and verifies that the configurations are correctly set.
+This script provides a flexible way to configure SSH server authentication settings by modifying the `sshd_config` file. It allows you to either disable password authentication in favor of SSH keys, or enable password authentication.
 
 ## ⚠️ Warning
 
-Disabling password authentication can lead to unintended consequences, including the possibility of being locked out of the system if SSH key authentication fails. Use caution when running this script, especially on remote servers, to ensure you have alternative means of access (such as physical or console access) in case of any issues.
+When disabling password authentication, ensure you have working SSH key access before logging out. Without proper key configuration, you risk being locked out of your system. Always maintain alternative access methods (physical/console) when making SSH configuration changes.
+
+## Features
+
+- Shows current SSH authentication settings
+- Offers two configuration options:
+  1. Secure mode: Disables password access and enables SSH key authentication
+  2. Password mode: Enables password authentication
+- Automatic backup and restoration options when using secure mode
+- Checks for existing SSH keys on the system
+- Verifies all configuration changes
+- Restarts SSH service automatically
 
 ## Usage
 
 ### Run directly
-
-`wget -O - https://raw.githubusercontent.com/lamat1111/password-connection-disabler/master/configure_ssh.sh | bash`
+```bash
+wget -O - https://raw.githubusercontent.com/lamat1111/ssh-config-script/master/configure_ssh.sh | bash
+```
 
 ### Run locally
+1. Download/clone the script
+2. Make executable: `chmod +x configure_ssh.sh`
+3. Run with sudo: `sudo ./configure_ssh.sh`
 
-1. Make sure you have the necessary permissions to modify the `sshd_config` file and restart the SSH service.
-2. Download or clone the script to your system.
-3. Make the script executable: `chmod +x configure_ssh.sh`
-4. Run the script with sudo privileges: `sudo ./configure_ssh.sh`
+## Configuration Details
 
-## Configuration Changes
+### Secure Mode (Option 1)
+- Disables password authentication
+- Enables SSH key authentication
+- Restricts root login to key-only
+- Creates backup of original config
+- Verifies existing SSH keys
+- Offers backup restoration
 
-1. Disable Root Login with Password: Sets PermitRootLogin to prohibit-password to disable root login with password.
-2. Ensure Password Authentication is Disabled: Sets PasswordAuthentication to no to disable password authentication for all users.
-3. Ensure Pubkey Authentication is Enabled: Ensures that public key authentication (PubkeyAuthentication) is enabled.
-4. Restart SSH Service: Restarts the SSH service to apply the changes.
-5. Verify Settings: Verifies that the configurations are correctly set after applying the changes.
+### Password Mode (Option 2)
+- Enables password authentication
+- Applies changes immediately
